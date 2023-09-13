@@ -1,0 +1,6 @@
+keytool -list -v -keystore "C:\Users\HARIKRUSHNA INFOTECH\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+
+Valid from: Tue Dec 27 18:35:19 IST 2022 until: Thu Dec 19 18:35:19 IST 2052
+Certificate fingerprints:
+         SHA1: F3:60:39:ED:F5:8E:E3:3A:C9:DB:6A:7E:A5:F0:E0:82:3F:D5:0F:26
+         SHA256: F6:B6:DD:93:1E:34:71:C3:13:85:FF:46:40:24:57:9F:0E:B6:8E:85:27:88:D2:81:91:C9:05:1B:B0:2A:65:5C
