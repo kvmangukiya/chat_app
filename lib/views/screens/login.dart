@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:chat_app/helpers/auth_helper.dart';
+import 'package:chat_app/modals/user_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -55,10 +59,14 @@ class LoginScreen extends StatelessWidget {
           icon: FontAwesomeIcons.google,
           label: 'Google',
           callback: () async {
-            debugPrint('start google sign in');
-            await Future.delayed(loginTime);
-            debugPrint('stop google sign in');
-            return null;
+            log("google sign in callback called");
+            await AuthHelper.authHelper.signInWithGoogle();
+            if (AuthHelper.lUser.email != "") {
+              debugPrint('start google sign in');
+              await Future.delayed(loginTime);
+              debugPrint('stop google sign in');
+              return null;
+            }
           },
         ),
         LoginProvider(
@@ -91,6 +99,7 @@ class LoginScreen extends StatelessWidget {
         ),
       ],
       onSubmitAnimationCompleted: () {
+        log("on submit animation called ...");
         Get.offNamed("/home");
       },
       onRecoverPassword: _recoverPassword,
