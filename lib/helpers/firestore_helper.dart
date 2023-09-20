@@ -20,7 +20,7 @@ class FireStoreHelper {
   String colPass = "pass";
   String colImagePath = "imagePath";
 
-  insertUsers({required UserModal userModal}) async {
+  Future<void> insertUsers({required UserModal userModal}) async {
     int newUserId = await getUsersId();
 
     Map<String, dynamic> userData = {
@@ -32,12 +32,12 @@ class FireStoreHelper {
       colImagePath: userModal.imagePath,
     };
 
-    firebaseFirestore
+    await firebaseFirestore
         .collection(collection)
         .doc(newUserId.toString())
         .set(userData)
-        .then((value) {
-      insertUsersId(newUserId + 1);
+        .then((value) async {
+      await insertUsersId(newUserId + 1);
       log("User data inserted...");
     });
   }
@@ -49,14 +49,17 @@ class FireStoreHelper {
   Future<int> getUsersId() async {
     DocumentSnapshot<Map<String, dynamic>> data = await firebaseFirestore
         .collection(collectionAutoIncrement)
-        .doc('users')
+        .doc(collection)
         .get();
     AutoIncrement userAI = AutoIncrement.fromMap(data.data() as Map);
     return userAI.val;
   }
 
-  insertUsersId(int id) async {
+  Future<void> insertUsersId(int id) async {
     Map<String, dynamic> userData = {"val": id};
-    firebaseFirestore.collection(collection).doc('users').set(userData);
+    await firebaseFirestore
+        .collection(collectionAutoIncrement)
+        .doc(collection)
+        .set(userData);
   }
 }

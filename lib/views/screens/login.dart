@@ -1,6 +1,6 @@
 import 'dart:developer';
-
 import 'package:chat_app/helpers/auth_helper.dart';
+import 'package:chat_app/helpers/firestore_helper.dart';
 import 'package:chat_app/modals/user_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -15,7 +15,7 @@ const users = {
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  Duration get loginTime => const Duration(milliseconds: 2250);
+  Duration get loginTime => const Duration(milliseconds: 1250);
 
   Future<String?> _authUser(LoginData data) {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
@@ -30,8 +30,11 @@ class LoginScreen extends StatelessWidget {
     });
   }
 
-  Future<String?> _signupUser(SignupData data) {
+  Future<String?> _signupUser(SignupData data) async {
     debugPrint('Signup Name: ${data.name}, Password: ${data.password}');
+    await FireStoreHelper.fireStoreHelper.insertUsers(
+        userModal: UserModal(
+            data.name ?? "", data.password ?? "", data.name, "", "", 0));
     return Future.delayed(loginTime).then((_) {
       return null;
     });
@@ -62,39 +65,14 @@ class LoginScreen extends StatelessWidget {
             log("google sign in callback called");
             await AuthHelper.authHelper.signInWithGoogle();
             if (AuthHelper.lUser.email != "") {
+              await FireStoreHelper.fireStoreHelper.insertUsers(
+                  userModal: UserModal(AuthHelper.lUser.email ?? "", "google",
+                      AuthHelper.lUser.name, "", AuthHelper.lUser.contact, 0));
               debugPrint('start google sign in');
               await Future.delayed(loginTime);
               debugPrint('stop google sign in');
               return null;
             }
-          },
-        ),
-        LoginProvider(
-          icon: FontAwesomeIcons.facebookF,
-          label: 'Facebook',
-          callback: () async {
-            debugPrint('start facebook sign in');
-            await Future.delayed(loginTime);
-            debugPrint('stop facebook sign in');
-            return null;
-          },
-        ),
-        LoginProvider(
-          icon: FontAwesomeIcons.linkedinIn,
-          callback: () async {
-            debugPrint('start linkdin sign in');
-            await Future.delayed(loginTime);
-            debugPrint('stop linkdin sign in');
-            return null;
-          },
-        ),
-        LoginProvider(
-          icon: FontAwesomeIcons.githubAlt,
-          callback: () async {
-            debugPrint('start github sign in');
-            await Future.delayed(loginTime);
-            debugPrint('stop github sign in');
-            return null;
           },
         ),
       ],

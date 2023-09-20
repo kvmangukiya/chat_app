@@ -34,13 +34,15 @@ class Users extends StatelessWidget {
                     usersList.map((e) => UserModal.fromMap(e.data())).toList();
                 return ListView(
                   children: users
-                      .map((user) => ListTile(
-                            title: Text(user.name ?? ""),
-                            subtitle: Text(user.email),
-                            leading: CircleAvatar(
-                              child: Text(user.id.toString()),
-                            ),
-                          ))
+                      .map(
+                        (user) => ListTile(
+                          title: Text(user.name ?? ""),
+                          subtitle: Text(user.email),
+                          leading: CircleAvatar(
+                            child: Text(user.id.toString()),
+                          ),
+                        ),
+                      )
                       .toList(),
                 );
               } else {
