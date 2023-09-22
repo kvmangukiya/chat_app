@@ -17,17 +17,21 @@ class LoginScreen extends StatelessWidget {
 
   Duration get loginTime => const Duration(milliseconds: 1250);
 
-  Future<String?> _authUser(LoginData data) {
+  Future<String?> _authUser(LoginData data) async {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(data.name)) {
-        return 'User not exists';
+
+    int res = await AuthHelper.authHelper
+        .signInWithUserEmail(int.parse(data.name), data.password);
+
+    if (res == 0) {
+      Get.snackbar("Fail !!!", "User doesn't exist...");
+    } else {
+      if (res > 1) {
+        Get.offNamed("/home");
+      } else {
+        Get.snackbar("Fail !!!", "Password doesn't matched...");
       }
-      if (users[data.name] != data.password) {
-        return 'Password does not match';
-      }
-      return null;
-    });
+    }
   }
 
   Future<String?> _signupUser(SignupData data) async {

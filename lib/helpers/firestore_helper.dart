@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:chat_app/modals/autoinc_modal.dart';
 import 'package:chat_app/modals/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FireStoreHelper {
   FireStoreHelper._pc();
@@ -46,6 +47,18 @@ class FireStoreHelper {
     return firebaseFirestore.collection(collection).snapshots();
   }
 
+  Future<UserModal> getUserDetail(int id) async {
+    DocumentSnapshot<Map<String, dynamic>> data =
+        await firebaseFirestore.collection(collection).doc("{$id}").get();
+    if (data.data() != null) {
+      UserModal userModal = UserModal.fromMap(data.data() as Map);
+      return userModal;
+    } else {
+      return UserModal("", "", "", "", "", 0);
+    }
+  }
+
+  //autoincrement logic
   Future<int> getUsersId() async {
     DocumentSnapshot<Map<String, dynamic>> data = await firebaseFirestore
         .collection(collectionAutoIncrement)
@@ -55,6 +68,7 @@ class FireStoreHelper {
     return userAI.val;
   }
 
+  //autoincrement logic
   Future<void> insertUsersId(int id) async {
     Map<String, dynamic> userData = {"val": id};
     await firebaseFirestore
