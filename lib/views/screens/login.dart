@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:chat_app/helpers/auth_helper.dart';
 import 'package:chat_app/helpers/firestore_helper.dart';
 import 'package:chat_app/modals/user_modal.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,9 +19,8 @@ class LoginScreen extends StatelessWidget {
   Duration get loginTime => const Duration(milliseconds: 500);
 
   Future<String?> _authUser(LoginData data) async {
-    int? res = await AuthHelper.authHelper
+    int res = await AuthHelper.authHelper
         .signInWithUserEmail(data.name, data.password);
-    res ??= 0;
     switch (res) {
       case 0:
         return "Fail ! didn't signup...";
@@ -43,9 +41,8 @@ class LoginScreen extends StatelessWidget {
     if (data.name == null || data.password == null) {
       return "Fail !!! please enter proper detail...";
     } else {
-      int? res = await AuthHelper.authHelper
+      int res = await AuthHelper.authHelper
           .signInWithUserEmail(data.name!, data.password!);
-      res ??= 0;
       if (res == 0) {
         int id = DateTime.now().millisecondsSinceEpoch;
         lUser = await FireStoreHelper.fireStoreHelper.insertUsers(

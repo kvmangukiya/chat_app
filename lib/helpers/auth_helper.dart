@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/helpers/firestore_helper.dart';
 import 'package:chat_app/modals/user_modal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
