@@ -47,6 +47,13 @@ class FireStoreHelper {
     return firebaseFirestore.collection(collection).snapshots();
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllChatUser(int id) {
+    return firebaseFirestore
+        .collection(collection)
+        .where("id", isNotEqualTo: id)
+        .snapshots();
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetailFromID(
       {required int id}) async {
     return await firebaseFirestore.collection(collection).doc("{$id}").get();

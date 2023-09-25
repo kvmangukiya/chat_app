@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +8,7 @@ import '../../modals/user_modal.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  UserModal? lUser = Get.arguments;
+  final UserModal lUser = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class HomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder(
-            stream: FireStoreHelper.fireStoreHelper.getAllUser(),
+            stream: FireStoreHelper.fireStoreHelper.getAllChatUser(lUser.id),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
@@ -61,14 +60,14 @@ class HomeScreen extends StatelessWidget {
       drawer: Drawer(
         child: UserAccountsDrawerHeader(
           currentAccountPicture: CircleAvatar(
-            foregroundImage: (lUser?.imagePath == null)
+            foregroundImage: (lUser.imagePath == null)
                 ? null
-                : NetworkImage(lUser?.imagePath as String),
+                : NetworkImage(lUser.imagePath as String),
           ),
-          accountName: (lUser?.name == null)
+          accountName: (lUser.name == null)
               ? const Text("")
-              : Text(lUser?.name as String),
-          accountEmail: Text("${lUser?.email}"),
+              : Text(lUser.name as String),
+          accountEmail: Text(lUser.email),
         ),
       ),
     );

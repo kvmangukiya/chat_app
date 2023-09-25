@@ -40,7 +40,9 @@ class Users extends StatelessWidget {
                           title: Text(user.name ?? ""),
                           subtitle: Text(user.email),
                           leading: CircleAvatar(
-                            child: Text((user.name ?? "").substring(1, 1)),
+                            child: Text((user.name ?? "")
+                                .substring(0, 1)
+                                .toUpperCase()),
                           ),
                         ),
                       )
@@ -56,12 +58,13 @@ class Users extends StatelessWidget {
       drawer: Drawer(
         child: UserAccountsDrawerHeader(
           currentAccountPicture: CircleAvatar(
-            child: lUser.imagePath == null
-                ? Text((lUser.name ?? "").substring(1, 1))
-                : Image.network(lUser.imagePath as String),
+            foregroundImage: (lUser.imagePath == null)
+                ? null
+                : NetworkImage(lUser.imagePath as String),
           ),
-          accountName:
-              lUser.name == null ? const Text("") : Text(lUser.name as String),
+          accountName: (lUser.name == null)
+              ? const Text("")
+              : Text(lUser.name as String),
           accountEmail: Text(lUser.email),
         ),
       ),
