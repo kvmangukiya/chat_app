@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       getPages: [
-        GetPage(name: "/home", page: () => const HomeScreen()),
-        GetPage(name: "/", page: () => const LoginScreen()),
-        // GetPage(name: "/", page: () => const Users()),
+        GetPage(name: "/", page: () => LoginScreen()),
+        GetPage(name: "/users", page: () => Users()),
+        GetPage(name: "/home", page: () => HomeScreen()),
       ],
     );
   }

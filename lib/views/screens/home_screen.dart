@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,10 +8,12 @@ import '../../helpers/firestore_helper.dart';
 import '../../modals/user_modal.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+  UserModal? lUser = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
+    log("Login Info: {$lUser}");
     return Scaffold(
       appBar: AppBar(
         title: const Text("HI Chat"),
@@ -39,7 +43,9 @@ class HomeScreen extends StatelessWidget {
                           title: Text(user.name ?? ""),
                           subtitle: Text(user.email),
                           leading: CircleAvatar(
-                            child: Text(user.id.toString()),
+                            child: Text((user.name ?? "")
+                                .substring(0, 1)
+                                .toUpperCase()),
                           ),
                         ),
                       )
@@ -55,14 +61,14 @@ class HomeScreen extends StatelessWidget {
       drawer: Drawer(
         child: UserAccountsDrawerHeader(
           currentAccountPicture: CircleAvatar(
-            child: AuthHelper.lUser.imagePath == null
-                ? const Text("")
-                : Image.network(AuthHelper.lUser.imagePath as String),
+            foregroundImage: (lUser?.imagePath == null)
+                ? null
+                : NetworkImage(lUser?.imagePath as String),
           ),
-          accountName: AuthHelper.lUser.name == null
+          accountName: (lUser?.name == null)
               ? const Text("")
-              : Text(AuthHelper.lUser.name as String),
-          accountEmail: Text(AuthHelper.lUser.email),
+              : Text(lUser?.name as String),
+          accountEmail: Text("${lUser?.email}"),
         ),
       ),
     );

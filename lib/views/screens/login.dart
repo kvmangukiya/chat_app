@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:chat_app/helpers/auth_helper.dart';
 import 'package:chat_app/helpers/firestore_helper.dart';
 import 'package:chat_app/modals/user_modal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,35 +14,56 @@ const users = {
 };
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
-  Duration get loginTime => const Duration(milliseconds: 1250);
+  UserModal? lUser;
+  Duration get loginTime => const Duration(milliseconds: 500);
 
   Future<String?> _authUser(LoginData data) async {
-    debugPrint('Name: ${data.name}, Password: ${data.password}');
-
-    int res = await AuthHelper.authHelper
-        .signInWithUserEmail(int.parse(data.name), data.password);
-
-    if (res == 0) {
-      Get.snackbar("Fail !!!", "User doesn't exist...");
-    } else {
-      if (res > 1) {
-        Get.offNamed("/home");
-      } else {
-        Get.snackbar("Fail !!!", "Password doesn't matched...");
-      }
+    int? res = await AuthHelper.authHelper
+        .signInWithUserEmail(data.name, data.password);
+    res ??= 0;
+    switch (res) {
+      case 0:
+        return "Fail ! didn't signup...";
+      case 1:
+        lUser = await FireStoreHelper.fireStoreHelper
+            .getUserDetailFromEmail(email: data.name)
+            .then((ud) => UserModal.fromMap(ud.docs[0].data()));
+        return null;
+      case 3:
+        return "Fail ! you have to sign in via google auth only...";
+      default:
+        return "Fail ! wrong password...";
     }
   }
 
   Future<String?> _signupUser(SignupData data) async {
     debugPrint('Signup Name: ${data.name}, Password: ${data.password}');
-    await FireStoreHelper.fireStoreHelper.insertUsers(
-        userModal: UserModal(
-            data.name ?? "", data.password ?? "", data.name, "", "", 0));
-    return Future.delayed(loginTime).then((_) {
-      return null;
-    });
+    if (data.name == null || data.password == null) {
+      return "Fail !!! please enter proper detail...";
+    } else {
+      int? res = await AuthHelper.authHelper
+          .signInWithUserEmail(data.name!, data.password!);
+      res ??= 0;
+      if (res == 0) {
+        int id = DateTime.now().millisecondsSinceEpoch;
+        lUser = await FireStoreHelper.fireStoreHelper.insertUsers(
+            userModal: UserModal(
+                id: id,
+                email: data.name!,
+                pass: data.password ?? "",
+                name: data.name,
+                imagePath: "",
+                contact: ""));
+        log("lUser Signup : ${lUser.toString()}");
+        return Future.delayed(loginTime).then((_) {
+          return null;
+        });
+      } else {
+        return "Failed !!! already signup...";
+      }
+    }
   }
 
   Future<String> _recoverPassword(String name) {
@@ -67,22 +89,21 @@ class LoginScreen extends StatelessWidget {
           label: 'Google',
           callback: () async {
             log("google sign in callback called");
-            await AuthHelper.authHelper.signInWithGoogle();
-            if (AuthHelper.lUser.email != "") {
-              await FireStoreHelper.fireStoreHelper.insertUsers(
-                  userModal: UserModal(AuthHelper.lUser.email ?? "", "google",
-                      AuthHelper.lUser.name, "", AuthHelper.lUser.contact, 0));
+            lUser = await AuthHelper.authHelper.signInWithGoogle();
+            if (lUser != null) {
               debugPrint('start google sign in');
               await Future.delayed(loginTime);
               debugPrint('stop google sign in');
               return null;
+            } else {
+              return "Fail ! Please try again...";
             }
           },
         ),
       ],
       onSubmitAnimationCompleted: () {
         log("on submit animation called ...");
-        Get.offNamed("/home");
+        Get.offNamed("/home", arguments: lUser);
       },
       onRecoverPassword: _recoverPassword,
     );

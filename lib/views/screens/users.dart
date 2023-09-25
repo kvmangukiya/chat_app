@@ -6,7 +6,8 @@ import 'package:get/get.dart';
 import '../../helpers/auth_helper.dart';
 
 class Users extends StatelessWidget {
-  const Users({super.key});
+  Users({super.key});
+  final UserModal lUser = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class Users extends StatelessWidget {
                           title: Text(user.name ?? ""),
                           subtitle: Text(user.email),
                           leading: CircleAvatar(
-                            child: Text(user.id.toString()),
+                            child: Text((user.name ?? "").substring(1, 1)),
                           ),
                         ),
                       )
@@ -55,14 +56,13 @@ class Users extends StatelessWidget {
       drawer: Drawer(
         child: UserAccountsDrawerHeader(
           currentAccountPicture: CircleAvatar(
-            child: AuthHelper.lUser.imagePath == null
-                ? const Text("")
-                : Image.network(AuthHelper.lUser.imagePath as String),
+            child: lUser.imagePath == null
+                ? Text((lUser.name ?? "").substring(1, 1))
+                : Image.network(lUser.imagePath as String),
           ),
-          accountName: AuthHelper.lUser.name == null
-              ? const Text("")
-              : Text(AuthHelper.lUser.name as String),
-          accountEmail: Text(AuthHelper.lUser.email),
+          accountName:
+              lUser.name == null ? const Text("") : Text(lUser.name as String),
+          accountEmail: Text(lUser.email),
         ),
       ),
     );
