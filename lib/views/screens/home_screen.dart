@@ -6,6 +6,7 @@ import '../../helpers/auth_helper.dart';
 import '../../helpers/firestore_helper.dart';
 import '../../modals/user_modal.dart';
 import '../components/drawer.dart';
+import '../components/functions.dart';
 import '../components/theme_button.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -38,8 +39,10 @@ class HomeScreen extends StatelessWidget {
                 children: usersList.map(
                   (userData) {
                     Map<String, dynamic> user = userData.data();
-                    int dispTime = user['lastMsgTime'];
-                    // if (dispTime) {}
+                    String lastMTime = lastMsgTime(
+                        DateTime.fromMillisecondsSinceEpoch(
+                            user['lastMsgTime']));
+
                     return ListTile(
                       title: Text(user['name'] ?? ""),
                       subtitle: Text(user['lastMsg']),
@@ -54,7 +57,22 @@ class HomeScreen extends StatelessWidget {
                                 .toUpperCase())
                             : null,
                       ),
-                      trailing: Text("${dispTime}"),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(lastMTime),
+                          const SizedBox(height: 2),
+                          (user['lastUnreadMsgCount'] > 0)
+                              ? CircleAvatar(
+                                  radius: 10,
+                                  child: Text(
+                                      user['lastUnreadMsgCount'].toString(),
+                                      style: const TextStyle(fontSize: 12)),
+                                )
+                              : const SizedBox(height: 20),
+                        ],
+                      ),
                     );
                   },
                 ).toList(),
