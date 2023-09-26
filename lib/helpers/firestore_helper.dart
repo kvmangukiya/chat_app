@@ -43,14 +43,23 @@ class FireStoreHelper {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUser() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
     return firebaseFirestore.collection(collection).snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllChatUser(int id) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllNewChatUser(int id) {
     return firebaseFirestore
         .collection(collection)
-        .where("id", isNotEqualTo: id)
+        .where("id", isNotEqualTo: id, isGreaterThan: 1)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getChatUsers(int id) {
+    return firebaseFirestore
+        .collection(collection)
+        .doc(id.toString())
+        .collection("contacts")
+        .orderBy("lastMsgTime", descending: true)
         .snapshots();
   }
 

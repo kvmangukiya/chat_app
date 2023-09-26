@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../helpers/auth_helper.dart';
+import '../components/drawer.dart';
 
 class Users extends StatelessWidget {
   Users({super.key});
@@ -26,7 +27,7 @@ class Users extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder(
-            stream: FireStoreHelper.fireStoreHelper.getAllUser(),
+            stream: FireStoreHelper.fireStoreHelper.getAllUsers(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
@@ -55,19 +56,7 @@ class Users extends StatelessWidget {
               }
             }),
       ),
-      drawer: Drawer(
-        child: UserAccountsDrawerHeader(
-          currentAccountPicture: CircleAvatar(
-            foregroundImage: (lUser.imagePath == null)
-                ? null
-                : NetworkImage(lUser.imagePath as String),
-          ),
-          accountName: (lUser.name == null)
-              ? const Text("")
-              : Text(lUser.name as String),
-          accountEmail: Text(lUser.email),
-        ),
-      ),
+      drawer: hiDrawer(lUser),
     );
   }
 }

@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import '../../helpers/auth_helper.dart';
 import '../../helpers/firestore_helper.dart';
 import '../../modals/user_modal.dart';
+import '../components/drawer.dart';
+import '../components/theme_button.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -17,6 +19,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("HI Chat"),
         actions: [
+          themeButton(context),
           IconButton(
               onPressed: () {
                 AuthHelper.authHelper.signOutWithGoogle();
@@ -25,51 +28,50 @@ class HomeScreen extends StatelessWidget {
               icon: const Icon(Icons.logout))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: StreamBuilder(
-            stream: FireStoreHelper.fireStoreHelper.getAllChatUser(lUser.id),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
-                    snapshot.data!.docs;
-                List<UserModal> users =
-                    usersList.map((e) => UserModal.fromMap(e.data())).toList();
-                return ListView(
-                  children: users
-                      .map(
-                        (user) => ListTile(
-                          title: Text(user.name ?? ""),
-                          subtitle: Text(user.email),
-                          leading: CircleAvatar(
-                            child: Text((user.name ?? "")
+      body: StreamBuilder(
+          stream: FireStoreHelper.fireStoreHelper.getChatUsers(lUser.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
+                  snapshot.data!.docs;
+              return ListView(
+                children: usersList.map(
+                  (userData) {
+                    Map<String, dynamic> user = userData.data();
+                    int dispTime = user['lastMsgTime'];
+                    // if (dispTime) {}
+                    return ListTile(
+                      title: Text(user['name'] ?? ""),
+                      subtitle: Text(user['lastMsg']),
+                      leading: CircleAvatar(
+                        foregroundImage: (user['imagePath'] == null)
+                            ? null
+                            : NetworkImage(user['imagePath']),
+                        child: (user['imagePath'] == null ||
+                                user['imagePath'] == "")
+                            ? Text((user['name'] ?? "")
                                 .substring(0, 1)
-                                .toUpperCase()),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            }),
+                                .toUpperCase())
+                            : null,
+                      ),
+                      trailing: Text("${dispTime}"),
+                    );
+                  },
+                ).toList(),
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () {
+          Get.toNamed("/newChat", arguments: lUser);
+        },
+        child: const Icon(Icons.message_outlined, size: 22),
       ),
-      drawer: Drawer(
-        child: UserAccountsDrawerHeader(
-          currentAccountPicture: CircleAvatar(
-            foregroundImage: (lUser.imagePath == null)
-                ? null
-                : NetworkImage(lUser.imagePath as String),
-          ),
-          accountName: (lUser.name == null)
-              ? const Text("")
-              : Text(lUser.name as String),
-          accountEmail: Text(lUser.email),
-        ),
-      ),
+      drawer: hiDrawer(lUser),
     );
   }
 }
