@@ -63,6 +63,18 @@ class FireStoreHelper {
         .snapshots();
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> getChat(int loginId, int curId) {
+    log("loginId: $loginId");
+    log("curId: $curId");
+    return firebaseFirestore
+        .collection(collection)
+        .doc(loginId.toString())
+        .collection("contacts")
+        .doc(curId.toString())
+        .collection("chats")
+        .snapshots();
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetailFromID(
       {required int id}) async {
     return await firebaseFirestore.collection(collection).doc("{$id}").get();

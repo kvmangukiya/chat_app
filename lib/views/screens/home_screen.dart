@@ -44,6 +44,9 @@ class HomeScreen extends StatelessWidget {
                             user['lastMsgTime']));
 
                     return ListTile(
+                      onTap: () {
+                        Get.toNamed("/chat", arguments: [lUser, user]);
+                      },
                       title: Text(user['name'] ?? ""),
                       subtitle: Text(user['lastMsg']),
                       leading: CircleAvatar(

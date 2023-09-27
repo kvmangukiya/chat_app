@@ -8,9 +8,10 @@ import '../../helpers/firestore_helper.dart';
 import '../../modals/user_modal.dart';
 import '../components/theme_button.dart';
 
-class NewChat extends StatelessWidget {
-  NewChat({super.key});
-  final UserModal lUser = Get.arguments;
+class Chat extends StatelessWidget {
+  Chat({super.key});
+  final UserModal lUser = Get.arguments[0];
+  final Map<String, dynamic> cUser = Get.arguments[1];
 
   @override
   Widget build(BuildContext context) {
@@ -30,25 +31,18 @@ class NewChat extends StatelessWidget {
         ],
       ),
       body: StreamBuilder(
-          stream: FireStoreHelper.fireStoreHelper.getAllNewChatUser(lUser.id),
+          stream:
+              FireStoreHelper.fireStoreHelper.getChat(lUser.id, cUser['id']),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
+              List<QueryDocumentSnapshot<Map<String, dynamic>>> chatList =
                   snapshot.data!.docs;
-              List<UserModal> users =
-                  usersList.map((e) => UserModal.fromMap(e.data())).toList();
+
               return ListView(
-                children: users
-                    .map(
-                      (user) => ListTile(
-                        title: Text(user.name ?? ""),
-                        subtitle: Text(user.email),
-                        leading: CircleAvatar(
-                          child: Text(
-                              (user.name ?? "").substring(0, 1).toUpperCase()),
-                        ),
-                      ),
-                    )
+                children: chatList
+                    .map((chat) => Card(
+                          child: Text(chat['msg']),
+                        ))
                     .toList(),
               );
             } else {
