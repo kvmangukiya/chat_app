@@ -9,10 +9,41 @@ import '../../modals/user_modal.dart';
 import '../components/drawer.dart';
 import '../components/functions.dart';
 import '../components/theme_button.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final UserModal lUser = Get.arguments;
+
+  @override
+  initState() {
+    super.initState();
+
+    checkPermission();
+  }
+
+  checkPermission() async {
+    if (await Permission.notification.isDenied) {
+      Get.dialog(
+        AlertDialog(
+          title: const Text("Please allow notifications..."),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  openAppSettings();
+                },
+                icon: const Icon(Icons.settings))
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +121,13 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.small(
         onPressed: () {
           // Get.toNamed("/newChat", arguments: lUser);
-          LocalNotificationHelper.localNotificationHelper.simpleNotification(
+
+          // LocalNotificationHelper.localNotificationHelper.simpleNotification(
+          //     userId: lUser.id % 10000,
+          //     title: "Shital",
+          //     subTitle: "Jai Swaminarayan");
+
+          LocalNotificationHelper.localNotificationHelper.scheduleNotification(
               userId: lUser.id % 10000,
               title: "Shital",
               subTitle: "Jai Swaminarayan");
