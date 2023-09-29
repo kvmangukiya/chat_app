@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 class UserModal {
   int id;
   String email;
@@ -17,7 +15,6 @@ class UserModal {
       this.contact});
 
   factory UserModal.fromMap(Map userModal) {
-    log(userModal.toString());
     UserModal um = UserModal(
         id: userModal['id'],
         email: userModal['email'],
@@ -27,13 +24,4 @@ class UserModal {
         contact: userModal['contact']);
     return um;
   }
-
-  factory UserModal.fromJson(Map<String, dynamic> json) => UserModal(
-        id: json["id"],
-        email: json["email"],
-        pass: json["pass"],
-        name: json["name"],
-        imagePath: json["imagePath"],
-        contact: json["contact"],
-      );
 }

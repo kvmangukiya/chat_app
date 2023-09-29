@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:chat_app/helpers/notification_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -88,7 +89,11 @@ class HomeScreen extends StatelessWidget {
           }),
       floatingActionButton: FloatingActionButton.small(
         onPressed: () {
-          Get.toNamed("/newChat", arguments: lUser);
+          // Get.toNamed("/newChat", arguments: lUser);
+          LocalNotificationHelper.localNotificationHelper.simpleNotification(
+              userId: lUser.id % 10000,
+              title: "Shital",
+              subTitle: "Jai Swaminarayan");
         },
         child: const Icon(Icons.message_outlined, size: 22),
       ),
