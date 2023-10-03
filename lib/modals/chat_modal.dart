@@ -13,12 +13,12 @@ class ChatModal {
       required this.type});
 
   factory ChatModal.fromMap(Map chatModal) {
-    ChatModal um = ChatModal(
+    ChatModal cm = ChatModal(
         id: chatModal['id'],
         msg: chatModal['msg'],
         msgTime: chatModal['msgTime'],
         seenTime: chatModal['seenTime'],
         type: chatModal['type']);
-    return um;
+    return cm;
   }
 }

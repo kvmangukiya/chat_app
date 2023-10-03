@@ -12,10 +12,16 @@ const users = {
   'hunter@gmail.com': 'hunter',
 };
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   UserModal? lUser;
+
   Duration get loginTime => const Duration(milliseconds: 500);
 
   Future<String?> _authUser(LoginData data) async {
@@ -46,13 +52,14 @@ class LoginScreen extends StatelessWidget {
       if (res == 0) {
         int id = DateTime.now().millisecondsSinceEpoch;
         lUser = await FireStoreHelper.fireStoreHelper.insertUsers(
-            userModal: UserModal(
-                id: id,
-                email: data.name!,
-                pass: data.password ?? "",
-                name: data.name,
-                imagePath: "",
-                contact: ""));
+          userModal: UserModal(
+              id: id,
+              email: data.name!,
+              pass: data.password ?? "",
+              name: data.name,
+              imagePath: "",
+              contact: ""),
+        );
         log("lUser Signup : ${lUser.toString()}");
         return Future.delayed(loginTime).then((_) {
           return null;
@@ -78,6 +85,10 @@ class LoginScreen extends StatelessWidget {
     return FlutterLogin(
       title: 'HI Chat',
       logo: const AssetImage('assets/images/logo.png'),
+      theme: LoginTheme(
+        pageColorLight: Colors.white,
+        pageColorDark: Colors.white,
+      ),
       onLogin: _authUser,
       onSignup: _signupUser,
       loginProviders: <LoginProvider>[

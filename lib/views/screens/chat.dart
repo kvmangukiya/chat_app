@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:chat_app/modals/chat_modal.dart';
 import 'package:chat_app/views/components/back_button.dart';
 import 'package:chat_app/views/components/functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,16 +10,37 @@ import '../../helpers/firestore_helper.dart';
 import '../../modals/color_modal.dart';
 import '../../modals/user_modal.dart';
 import '../components/theme_button.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
-class Chat extends StatelessWidget {
-  Chat({super.key});
+class Chat extends StatefulWidget {
+  const Chat({super.key});
+
+  @override
+  State<Chat> createState() => _ChatState();
+}
+
+class _ChatState extends State<Chat> {
   final UserModal lUser = Get.arguments[0];
+
   final Map<String, dynamic> cUser = Get.arguments[1];
+
   TextEditingController newChat = TextEditingController();
+
+  late AutoScrollController scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = AutoScrollController(
+        viewportBoundaryGetter: () =>
+            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+        axis: Axis.vertical);
+  }
 
   @override
   Widget build(BuildContext context) {
     log("Login Info: {$lUser}");
+
     return Scaffold(
       appBar: AppBar(
         leading: backButton(context),
@@ -47,42 +69,55 @@ class Chat extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.all(16),
                       child: ListView(
+                        controller: scrollController,
                         children: chatList
-                            .map((chat) => Row(
-                                  mainAxisAlignment:
-                                      chatAlignment(chat['type']),
-                                  children: [
-                                    Card(
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.7,
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              chat['msg'],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            Align(
-                                              alignment: Alignment.bottomRight,
-                                              child: Text(
-                                                chatMsgTime(chat['msgTime']),
-                                                textAlign: TextAlign.right,
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        Colors.grey.shade500),
+                            .map((chat) => AutoScrollTag(
+                                  key: ValueKey(chat['id']),
+                                  controller: scrollController,
+                                  index: chat['id'],
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        chatAlignment(chat['type']),
+                                    children: [
+                                      Card(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.7,
+                                          child: Column(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  chat['msg'],
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                              Align(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                child: Text(
+                                                  chatMsgTime(chat['msgTime']),
+                                                  textAlign: TextAlign.right,
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color:
+                                                          Colors.grey.shade500),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ))
                             .toList(),
                       ),
@@ -118,15 +153,43 @@ class Chat extends StatelessWidget {
               suffixIcon: IconButton(
                 color: ColorModal.primaryColor,
                 icon: const Icon(Icons.send_rounded),
-                onPressed: () {},
+                onPressed: () async {
+                  if (newChat.text != "") {
+                    int id = DateTime.now().millisecondsSinceEpoch;
+                    if (await FireStoreHelper.fireStoreHelper.insertChat(
+                      senderId: lUser.id,
+                      receiverId: cUser['id'],
+                      chatMsg: ChatModal(
+                          id: id,
+                          msg: newChat.text,
+                          msgTime: id,
+                          seenTime: 0,
+                          type: "S"),
+                    )) {
+                      newChat.text = "";
+                    }
+                  }
+                },
               ),
               labelStyle: const TextStyle().copyWith(color: Colors.grey),
               contentPadding: const EdgeInsets.all(12),
             ),
           ),
+          _scrollToIndex1(),
         ],
       ),
     );
+  }
+
+  Widget _scrollToIndex1() {
+    Future.delayed(Duration(milliseconds: 400))
+        .then((value) => _scrollToIndex());
+    return Container();
+  }
+
+  Future<void> _scrollToIndex() async {
+    await scrollController.scrollToIndex(1696218154704,
+        preferPosition: AutoScrollPosition.end);
   }
 
   MainAxisAlignment chatAlignment(String sType) {

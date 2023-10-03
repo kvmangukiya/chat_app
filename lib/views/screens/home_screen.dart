@@ -76,7 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             user['lastMsgTime']));
 
                     return ListTile(
-                      onTap: () {
+                      onTap: () async {
+                        await FireStoreHelper.fireStoreHelper.updateChatContact(
+                            senderId: lUser.id, receiverId: user['id']);
                         Get.toNamed("/chat", arguments: [lUser, user]);
                       },
                       title: Text(user['name'] ?? ""),

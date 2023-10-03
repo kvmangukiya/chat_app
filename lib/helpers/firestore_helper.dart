@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:chat_app/modals/chat_modal.dart';
+import 'package:chat_app/modals/contact_modal.dart';
 import 'package:chat_app/modals/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -17,6 +19,14 @@ class FireStoreHelper {
   String colContact = "contact";
   String colPass = "pass";
   String colImagePath = "imagePath";
+  String colMsg = "msg";
+  String colMsgTime = "msgTime";
+  String colSeenTime = "seenTime";
+  String colType = "type";
+  String colLastMsg = "lastMsg";
+  String colLastMsgTime = "lastMsgTime";
+  String colLastUnreadMsgCount = "lastUnreadMsgCount";
+  String colLastUnreadMsgId = "lastUnreadMsgId";
 
   Future<UserModal?> insertUsers({required UserModal userModal}) async {
     Map<String, dynamic> userData = {
@@ -41,6 +51,97 @@ class FireStoreHelper {
     } else {
       return null;
     }
+  }
+
+  Future<bool> insertChat(
+      {required int senderId,
+      required int receiverId,
+      required ChatModal chatMsg}) async {
+    Map<String, dynamic> chatDataS = {
+      colId: chatMsg.id,
+      colMsg: chatMsg.msg,
+      colMsgTime: chatMsg.msgTime,
+      colSeenTime: 0,
+      colType: "S",
+    };
+    Map<String, dynamic> chatDataR = {
+      colId: chatMsg.id,
+      colMsg: chatMsg.msg,
+      colMsgTime: chatMsg.msgTime,
+      colSeenTime: 0,
+      colType: "R",
+    };
+    bool sucFlag = false;
+    //sender sent message entry
+    await firebaseFirestore
+        .collection(collection)
+        .doc(senderId.toString())
+        .collection("contacts")
+        .doc(receiverId.toString())
+        .collection("chats")
+        .doc(chatMsg.id.toString())
+        .set(chatDataS)
+        .then((value) async {
+      //receiver receive message entry
+      await firebaseFirestore
+          .collection(collection)
+          .doc(receiverId.toString())
+          .collection("contacts")
+          .doc(senderId.toString())
+          .collection("chats")
+          .doc(chatMsg.id.toString())
+          .set(chatDataR)
+          .then((value) async {
+        ContactModal cUser = await FireStoreHelper.fireStoreHelper
+            .contactDetail(senderId: senderId, receiverId: receiverId)
+            .then((ud) => ContactModal.fromMap(ud.docs[0].data()));
+        if (cUser.lastUnreadMsgCount > 0) {
+          cUser.lastUnreadMsgCount += 1;
+        } else {
+          cUser.lastUnreadMsgCount = 1;
+          cUser.lastUnreadMsgId = chatMsg.id;
+        }
+        //receiver receive unread message count update
+        Map<String, dynamic> chatUserData = {
+          colLastMsg: chatMsg.msg,
+          colLastMsgTime: chatMsg.msgTime,
+          colLastUnreadMsgCount: cUser.lastUnreadMsgCount,
+          colLastUnreadMsgId: cUser.lastUnreadMsgId,
+        };
+        await firebaseFirestore
+            .collection(collection)
+            .doc(receiverId.toString())
+            .collection("contacts")
+            .doc(senderId.toString())
+            .update(chatUserData)
+            .then((value) async {
+          sucFlag = true;
+          log("chat inserted...");
+        });
+      });
+    });
+    return sucFlag;
+  }
+
+  Future<bool> updateChatContact(
+      {required int senderId, required int receiverId}) async {
+    bool sucFlag = false;
+    //receiver receive unread message count update
+    Map<String, dynamic> chatUserData = {
+      colLastUnreadMsgCount: 0,
+      colLastUnreadMsgId: 0,
+    };
+    await firebaseFirestore
+        .collection(collection)
+        .doc(senderId.toString())
+        .collection("contacts")
+        .doc(receiverId.toString())
+        .update(chatUserData)
+        .then((value) async {
+      sucFlag = true;
+      log("unread chat user updated...");
+    });
+    return sucFlag;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
@@ -88,10 +189,20 @@ class FireStoreHelper {
         .get();
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> contactDetail(
+      {required int senderId, required int receiverId}) async {
+    return await firebaseFirestore
+        .collection(collection)
+        .doc(receiverId.toString())
+        .collection("contacts")
+        .where("id", isEqualTo: senderId)
+        .get();
+  }
+
   Future<UserModal?> getGoogleUserDetail(UserModal userModal) async {
     DocumentSnapshot<Map<String, dynamic>> data = await firebaseFirestore
         .collection(collection)
-        .doc("{$userModal.email}")
+        .doc("{$userModal.id}")
         .get();
     if (data.data() != null) {
       return UserModal.fromMap(data.data() as Map);
