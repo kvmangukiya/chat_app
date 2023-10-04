@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:chat_app/modals/chat_modal.dart';
+import 'package:chat_app/modals/contact_modal.dart';
 import 'package:chat_app/views/components/back_button.dart';
 import 'package:chat_app/views/components/functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,7 +23,7 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final UserModal lUser = Get.arguments[0];
 
-  final Map<String, dynamic> cUser = Get.arguments[1];
+  final ContactModal cUser = Get.arguments[1];
 
   TextEditingController newChat = TextEditingController();
 
@@ -44,7 +45,7 @@ class _ChatState extends State<Chat> {
     return Scaffold(
       appBar: AppBar(
         leading: backButton(context),
-        title: Text(cUser['name']),
+        title: Text(cUser.name),
         actions: [
           themeButton(context),
           IconButton(
@@ -59,8 +60,8 @@ class _ChatState extends State<Chat> {
         children: [
           Expanded(
             child: StreamBuilder(
-                stream: FireStoreHelper.fireStoreHelper
-                    .getChat(lUser.id, cUser['id']),
+                stream:
+                    FireStoreHelper.fireStoreHelper.getChat(lUser.id, cUser.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List<QueryDocumentSnapshot<Map<String, dynamic>>> chatList =
@@ -158,7 +159,7 @@ class _ChatState extends State<Chat> {
                     int id = DateTime.now().millisecondsSinceEpoch;
                     if (await FireStoreHelper.fireStoreHelper.insertChat(
                       senderId: lUser.id,
-                      receiverId: cUser['id'],
+                      receiverId: cUser.id,
                       chatMsg: ChatModal(
                           id: id,
                           msg: newChat.text,
@@ -182,7 +183,7 @@ class _ChatState extends State<Chat> {
   }
 
   Widget _scrollToIndex1() {
-    Future.delayed(Duration(milliseconds: 400))
+    Future.delayed(const Duration(milliseconds: 400))
         .then((value) => _scrollToIndex());
     return Container();
   }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:chat_app/modals/contact_modal.dart';
 import 'package:chat_app/views/components/back_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,25 @@ class NewChat extends StatelessWidget {
                 children: users
                     .map(
                       (user) => ListTile(
+                        onTap: () async {
+                          bool resFlag = await FireStoreHelper.fireStoreHelper
+                              .newChatContact(
+                                  senderId: lUser.id, receiverId: user.id);
+                          if (resFlag) {
+                            ContactModal cm = ContactModal(
+                                id: user.id,
+                                name: user.name ?? "",
+                                imagePath: user.imagePath ?? "",
+                                lastMsg: "",
+                                lastMsgTime: 0,
+                                lastUnreadMsgCount: 0,
+                                lastUnreadMsgId: 0);
+                            Get.offNamed("/chat", arguments: [lUser, cm]);
+                          } else {
+                            Get.snackbar("Fail...",
+                                "There is some problem, try after some time...");
+                          }
+                        },
                         title: Text(user.name ?? ""),
                         subtitle: Text(user.email),
                         leading: CircleAvatar(

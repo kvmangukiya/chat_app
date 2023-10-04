@@ -144,6 +144,73 @@ class FireStoreHelper {
     return sucFlag;
   }
 
+  Future<bool> newChatContact(
+      {required int senderId, required int receiverId}) async {
+    bool sucFlag = false;
+    //sender to receiver chat exist ?
+    DocumentSnapshot<Map<String, dynamic>> data = await firebaseFirestore
+        .collection(collection)
+        .doc(senderId.toString())
+        .collection("contacts")
+        .doc(receiverId.toString())
+        .get();
+    if (data.data() == null) {
+      //sender to receiver chat creation
+      log(receiverId.toString());
+      data = await getUserDetailFromID(id: receiverId);
+      UserModal userModal = UserModal.fromMap(data.data() as Map);
+      Map<String, dynamic> recUserData = {
+        colId: receiverId,
+        colImagePath: userModal.imagePath,
+        colLastMsg: "",
+        colLastMsgTime: 0,
+        colLastUnreadMsgCount: 0,
+        colLastUnreadMsgId: 0,
+        colName: userModal.name,
+      };
+      await firebaseFirestore
+          .collection(collection)
+          .doc(senderId.toString())
+          .collection("contacts")
+          .doc(receiverId.toString())
+          .set(recUserData)
+          .then((value) async {
+        sucFlag = true;
+      });
+    }
+    //receiver to sender chat exist ?
+    data = await firebaseFirestore
+        .collection(collection)
+        .doc(receiverId.toString())
+        .collection("contacts")
+        .doc(senderId.toString())
+        .get();
+    if (data.data() == null) {
+      //receiver to sender chat creation
+      data = await getUserDetailFromID(id: senderId);
+      UserModal userModal = UserModal.fromMap(data.data() as Map);
+      Map<String, dynamic> sendUserData = {
+        colId: senderId,
+        colImagePath: userModal.imagePath,
+        colLastMsg: "",
+        colLastMsgTime: 0,
+        colLastUnreadMsgCount: 0,
+        colLastUnreadMsgId: 0,
+        colName: userModal.name,
+      };
+      await firebaseFirestore
+          .collection(collection)
+          .doc(receiverId.toString())
+          .collection("contacts")
+          .doc(senderId.toString())
+          .set(sendUserData)
+          .then((value) async {
+        sucFlag = true;
+      });
+    }
+    return sucFlag;
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
     return firebaseFirestore.collection(collection).snapshots();
   }
@@ -178,7 +245,10 @@ class FireStoreHelper {
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetailFromID(
       {required int id}) async {
-    return await firebaseFirestore.collection(collection).doc("{$id}").get();
+    return await firebaseFirestore
+        .collection(collection)
+        .doc(id.toString())
+        .get();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getUserDetailFromEmail(

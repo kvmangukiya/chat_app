@@ -1,6 +1,5 @@
 import 'dart:developer';
-import 'package:chat_app/helpers/notification_helper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:chat_app/modals/contact_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../helpers/auth_helper.dart';
@@ -47,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String lastMTime;
+
     log("Login Info: {$lUser}");
     return Scaffold(
       appBar: AppBar(
@@ -65,33 +66,34 @@ class _HomeScreenState extends State<HomeScreen> {
           stream: FireStoreHelper.fireStoreHelper.getChatUsers(lUser.id),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<QueryDocumentSnapshot<Map<String, dynamic>>> usersList =
-                  snapshot.data!.docs;
+              List<ContactModal> usersList = snapshot.data!.docs
+                  .map((e) => ContactModal.fromMap(e.data()))
+                  .toList();
+              log("Users:  ${usersList.length.toString()}");
               return ListView(
                 children: usersList.map(
                   (userData) {
-                    Map<String, dynamic> user = userData.data();
-                    String lastMTime = lastMsgTime(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            user['lastMsgTime']));
+                    log(userData.toString());
+                    lastMTime = lastMsgTime(DateTime.fromMillisecondsSinceEpoch(
+                        userData.lastMsgTime));
 
                     return ListTile(
                       onTap: () async {
                         await FireStoreHelper.fireStoreHelper.updateChatContact(
-                            senderId: lUser.id, receiverId: user['id']);
-                        Get.toNamed("/chat", arguments: [lUser, user]);
+                            senderId: lUser.id, receiverId: userData.id);
+                        Get.toNamed("/chat", arguments: [lUser, userData]);
                       },
-                      title: Text(user['name'] ?? ""),
-                      subtitle: Text(user['lastMsg']),
+                      title: Text(userData.name),
+                      subtitle: Text(userData.lastMsg),
                       leading: CircleAvatar(
-                        foregroundImage: (user['imagePath'] == null)
+                        foregroundImage: (userData.imagePath == "")
                             ? null
-                            : NetworkImage(user['imagePath']),
-                        child: (user['imagePath'] == null ||
-                                user['imagePath'] == "")
-                            ? Text((user['name'] ?? "")
-                                .substring(0, 1)
-                                .toUpperCase())
+                            : NetworkImage(userData.imagePath),
+                        child: (userData.imagePath.isEmpty)
+                            ? (userData.name.isNotEmpty
+                                ? Text(
+                                    userData.name.substring(0, 1).toUpperCase())
+                                : null)
                             : null,
                       ),
                       trailing: Column(
@@ -100,11 +102,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(lastMTime),
                           const SizedBox(height: 2),
-                          (user['lastUnreadMsgCount'] > 0)
+                          (userData.lastUnreadMsgCount > 0)
                               ? CircleAvatar(
                                   radius: 10,
                                   child: Text(
-                                      user['lastUnreadMsgCount'].toString(),
+                                      userData.lastUnreadMsgCount.toString(),
                                       style: const TextStyle(fontSize: 12)),
                                 )
                               : const SizedBox(height: 20),
@@ -122,17 +124,17 @@ class _HomeScreenState extends State<HomeScreen> {
           }),
       floatingActionButton: FloatingActionButton.small(
         onPressed: () {
-          // Get.toNamed("/newChat", arguments: lUser);
+          Get.toNamed("/newChat", arguments: lUser);
 
           // LocalNotificationHelper.localNotificationHelper.simpleNotification(
           //     userId: lUser.id % 10000,
           //     title: "Shital",
           //     subTitle: "Jai Swaminarayan");
 
-          LocalNotificationHelper.localNotificationHelper.scheduleNotification(
-              userId: lUser.id % 10000,
-              title: "Shital",
-              subTitle: "Jai Swaminarayan");
+          // LocalNotificationHelper.localNotificationHelper.scheduleNotification(
+          //     userId: lUser.id % 10000,
+          //     title: "Shital",
+          //     subTitle: "Jai Swaminarayan");
         },
         child: const Icon(Icons.message_outlined, size: 22),
       ),
