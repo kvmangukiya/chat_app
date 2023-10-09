@@ -27,6 +27,7 @@ class _ChatState extends State<Chat> {
   final ContactModal cUser = Get.arguments[1];
 
   TextEditingController newChat = TextEditingController();
+  TextEditingController editChat = TextEditingController();
 
   late AutoScrollController scrollController;
 
@@ -85,16 +86,88 @@ class _ChatState extends State<Chat> {
                                       showCupertinoDialog(
                                         context: context,
                                         builder: (context) {
+                                          editChat.text = chat.msg;
                                           return CupertinoAlertDialog(
                                             title: const Text("Edit Chat"),
-                                            content: Text(chat.msg),
+                                            content: Material(
+                                              child: TextFormField(
+                                                maxLines: 8,
+                                                minLines: 3,
+                                                controller: editChat,
+                                                textInputAction:
+                                                    TextInputAction.send,
+                                                textCapitalization:
+                                                    TextCapitalization
+                                                        .sentences,
+                                                style: const TextStyle()
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16,
+                                                        color: ColorModal
+                                                            .primaryColor),
+                                                decoration: InputDecoration(
+                                                  filled: true,
+                                                  fillColor: Colors.white
+                                                      .withOpacity(0.2),
+                                                  hintText:
+                                                      "Enter message here",
+                                                  hintStyle: const TextStyle()
+                                                      .copyWith(
+                                                          color: ColorModal
+                                                              .primaryColor
+                                                              .withOpacity(
+                                                                  0.5)),
+                                                  border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .all(
+                                                              Radius.circular(
+                                                                  8)),
+                                                      borderSide: BorderSide(
+                                                          color: ColorModal
+                                                              .primaryColor)),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                          borderRadius:
+                                                              const BorderRadius
+                                                                  .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          8)),
+                                                          borderSide: BorderSide(
+                                                              color: ColorModal
+                                                                  .primaryColor,
+                                                              width: 1.5)),
+                                                  labelStyle: const TextStyle()
+                                                      .copyWith(
+                                                          color: Colors.grey),
+                                                  contentPadding:
+                                                      const EdgeInsets.all(12),
+                                                ),
+                                              ),
+                                            ),
                                             actions: [
                                               CupertinoDialogAction(
                                                 isDefaultAction: true,
-                                                onPressed: () {
-                                                  Navigator.pop(context);
+                                                onPressed: () async {
+                                                  await FireStoreHelper
+                                                      .fireStoreHelper
+                                                      .editChat(
+                                                          lUser.id,
+                                                          cUser.id,
+                                                          chat.id,
+                                                          editChat.text)
+                                                      .then(
+                                                          (value) =>
+                                                              Navigator.pop(
+                                                                  context),
+                                                          onError: (e) =>
+                                                              Navigator.pop(
+                                                                  context));
                                                 },
-                                                child: const Text("Edit"),
+                                                child:
+                                                    const Text("Edit - Save"),
                                               ),
                                               CupertinoDialogAction(
                                                 isDestructiveAction: true,

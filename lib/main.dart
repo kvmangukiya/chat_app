@@ -2,6 +2,7 @@ import 'package:chat_app/views/screens/chat.dart';
 import 'package:chat_app/views/screens/home_screen.dart';
 import 'package:chat_app/views/screens/login.dart';
 import 'package:chat_app/views/screens/new_chat.dart';
+import 'package:chat_app/views/screens/splash_screen.dart';
 import 'package:chat_app/views/screens/users.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
       themeMode:
           themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
       getPages: [
-        GetPage(name: "/", page: () => LoginScreen()),
+        GetPage(name: "/", page: () => SplashScreen()),
+        GetPage(name: "/login", page: () => LoginScreen()),
         GetPage(name: "/users", page: () => Users()),
         GetPage(name: "/home", page: () => HomeScreen()),
         GetPage(name: "/newChat", page: () => NewChat()),

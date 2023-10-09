@@ -266,6 +266,30 @@ class FireStoreHelper {
     return true;
   }
 
+  Future<bool> editChat(
+      int senderId, int receiverId, int chatId, String msg) async {
+    if (msg != "") {
+      await firebaseFirestore
+          .collection(collection)
+          .doc(senderId.toString())
+          .collection("contacts")
+          .doc(receiverId.toString())
+          .collection("chats")
+          .doc(chatId.toString())
+          .update({'msg': msg}).then((value) async {
+        await firebaseFirestore
+            .collection(collection)
+            .doc(receiverId.toString())
+            .collection("contacts")
+            .doc(senderId.toString())
+            .collection("chats")
+            .doc(chatId.toString())
+            .update({'msg': msg}).then((value) => true, onError: (e) => false);
+      }, onError: (e) => false);
+    }
+    return true;
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetailFromID(
       {required int id}) async {
     return await firebaseFirestore

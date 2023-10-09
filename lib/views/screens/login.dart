@@ -7,6 +7,8 @@ import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import '../../modals/color_modal.dart';
+
 const users = {
   'dribbble@gmail.com': '12345',
   'hunter@gmail.com': 'hunter',
@@ -82,38 +84,55 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterLogin(
-      title: 'HI Chat',
-      logo: const AssetImage('assets/images/logo.png'),
-      theme: LoginTheme(
-        pageColorLight: Colors.white,
-        pageColorDark: Colors.white,
-      ),
-      onLogin: _authUser,
-      onSignup: _signupUser,
-      loginProviders: <LoginProvider>[
-        LoginProvider(
-          icon: FontAwesomeIcons.google,
-          label: 'Google',
-          callback: () async {
-            log("google sign in callback called");
-            lUser = await AuthHelper.authHelper.signInWithGoogle();
-            if (lUser != null) {
-              debugPrint('start google sign in');
-              await Future.delayed(loginTime);
-              debugPrint('stop google sign in');
-              return null;
-            } else {
-              return "Fail ! Please try again...";
-            }
+    return Stack(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                opacity: 0.7,
+                image: AssetImage("assets/images/bkg.png"),
+                fit: BoxFit.cover),
+          ),
+        ),
+        FlutterLogin(
+          title: 'HI Chat',
+          logo: const AssetImage('assets/images/logo.png'),
+          theme: LoginTheme(
+              pageColorLight: Colors.transparent,
+              pageColorDark: Colors.transparent,
+              titleStyle: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w500,
+                  color: ColorModal.primaryColor)),
+          onLogin: _authUser,
+          onSignup: _signupUser,
+          loginProviders: <LoginProvider>[
+            LoginProvider(
+              icon: FontAwesomeIcons.google,
+              label: 'Google',
+              callback: () async {
+                log("google sign in callback called");
+                lUser = await AuthHelper.authHelper.signInWithGoogle();
+                if (lUser != null) {
+                  debugPrint('start google sign in');
+                  await Future.delayed(loginTime);
+                  debugPrint('stop google sign in');
+                  return null;
+                } else {
+                  return "Fail ! Please try again...";
+                }
+              },
+            ),
+          ],
+          onSubmitAnimationCompleted: () {
+            log("on submit animation called ...");
+            Get.offNamed("/home", arguments: lUser);
           },
+          onRecoverPassword: _recoverPassword,
         ),
       ],
-      onSubmitAnimationCompleted: () {
-        log("on submit animation called ...");
-        Get.offNamed("/home", arguments: lUser);
-      },
-      onRecoverPassword: _recoverPassword,
     );
   }
 }
