@@ -110,8 +110,7 @@ class _ChatState extends State<Chat> {
                                                   filled: true,
                                                   fillColor: Colors.white
                                                       .withOpacity(0.2),
-                                                  hintText:
-                                                      "Enter message here",
+                                                  hintText: "Enter msg here",
                                                   hintStyle: const TextStyle()
                                                       .copyWith(
                                                           color: ColorModal
