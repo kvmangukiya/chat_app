@@ -194,41 +194,48 @@ class _ChatState extends State<Chat> {
                                       mainAxisAlignment:
                                           chatAlignment(chat.type),
                                       children: [
-                                        Card(
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7,
-                                            child: Column(
-                                              children: [
-                                                Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    chat.msg,
-                                                    style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w400),
+                                        LimitedBox(
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.7,
+                                          child: Card(
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7,
+                                              child: Column(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      chat.msg,
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    ),
                                                   ),
-                                                ),
-                                                Align(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  child: Text(
-                                                    chatMsgTime(chat.msgTime),
-                                                    textAlign: TextAlign.right,
-                                                    style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors
-                                                            .grey.shade500),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Text(
+                                                      chatMsgTime(chat.msgTime),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Colors
+                                                              .grey.shade500),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
