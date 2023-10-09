@@ -4,6 +4,7 @@ import 'package:chat_app/modals/contact_modal.dart';
 import 'package:chat_app/views/components/back_button.dart';
 import 'package:chat_app/views/components/functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../helpers/auth_helper.dart';
@@ -64,60 +65,103 @@ class _ChatState extends State<Chat> {
                     FireStoreHelper.fireStoreHelper.getChat(lUser.id, cUser.id),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    List<QueryDocumentSnapshot<Map<String, dynamic>>> chatList =
-                        snapshot.data!.docs;
-
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                        chatLists = snapshot.data!.docs;
+                    List<ChatModal> chatList = chatLists
+                        .map((e) => ChatModal.fromMap(e.data()))
+                        .toList();
                     return Padding(
                       padding: const EdgeInsets.all(16),
                       child: ListView(
                         controller: scrollController,
                         children: chatList
                             .map((chat) => AutoScrollTag(
-                                  key: ValueKey(chat['id']),
+                                  key: ValueKey(chat.id),
                                   controller: scrollController,
-                                  index: chat['id'],
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        chatAlignment(chat['type']),
-                                    children: [
-                                      Card(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.7,
-                                          child: Column(
-                                            children: [
-                                              Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  chat['msg'],
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
+                                  index: chat.id,
+                                  child: GestureDetector(
+                                    onLongPress: () {
+                                      log("test");
+                                      showCupertinoDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return CupertinoAlertDialog(
+                                            title: const Text("Edit Chat"),
+                                            content: Text(chat.msg),
+                                            actions: [
+                                              CupertinoDialogAction(
+                                                isDefaultAction: true,
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Edit"),
                                               ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                child: Text(
-                                                  chatMsgTime(chat['msgTime']),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color:
-                                                          Colors.grey.shade500),
-                                                ),
+                                              CupertinoDialogAction(
+                                                isDestructiveAction: true,
+                                                onPressed: () async {
+                                                  await FireStoreHelper
+                                                      .fireStoreHelper
+                                                      .deleteChat(lUser.id,
+                                                          cUser.id, chat.id)
+                                                      .then(
+                                                          (value) =>
+                                                              Navigator.pop(
+                                                                  context),
+                                                          onError: (e) =>
+                                                              Navigator.pop(
+                                                                  context));
+                                                },
+                                                child: const Text("Delete"),
                                               ),
                                             ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          chatAlignment(chat.type),
+                                      children: [
+                                        Card(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.7,
+                                            child: Column(
+                                              children: [
+                                                Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    chat.msg,
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ),
+                                                Align(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: Text(
+                                                    chatMsgTime(chat.msgTime),
+                                                    textAlign: TextAlign.right,
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Colors
+                                                            .grey.shade500),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ))
                             .toList(),
