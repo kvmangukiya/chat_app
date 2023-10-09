@@ -1,5 +1,9 @@
 # Project Definition: Chat App (Firebase Miner)
 
+
+https://github.com/kvmangukiya/chat_app/assets/130810865/16df12ff-d9fe-4934-93e4-4b4499bcf6e7
+
+
 ## Project Description:
 **"Firebase Miner (Chat App)"** is an innovative and secure mobile application developed using Flutter, aiming to provide users with a seamless two-way communication platform. The app utilizes the powerful features of Firebase Authentication and Firebase Firestore Database to ensure smooth user authentication and real-time data synchronization.
 
