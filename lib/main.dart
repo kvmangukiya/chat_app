@@ -43,12 +43,12 @@ class MyApp extends StatelessWidget {
       themeMode:
           themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
       getPages: [
-        GetPage(name: "/", page: () => SplashScreen()),
-        GetPage(name: "/login", page: () => LoginScreen()),
+        GetPage(name: "/", page: () => const SplashScreen()),
+        GetPage(name: "/login", page: () => const LoginScreen()),
         GetPage(name: "/users", page: () => Users()),
-        GetPage(name: "/home", page: () => HomeScreen()),
+        GetPage(name: "/home", page: () => const HomeScreen()),
         GetPage(name: "/newChat", page: () => NewChat()),
-        GetPage(name: "/chat", page: () => Chat()),
+        GetPage(name: "/chat", page: () => const Chat()),
       ],
     );
   }

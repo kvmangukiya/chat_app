@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:chat_app/modals/contact_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -47,10 +48,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     String lastMTime;
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     log("Login Info: {$lUser}");
     return Scaffold(
+      key: scaffoldKey,
+      drawer: hiDrawer(lUser),
       appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () => scaffoldKey.currentState!.openDrawer(),
+          child: Transform.scale(
+            scale: 0.6,
+            child: CircleAvatar(
+              foregroundImage: (lUser.imagePath == null)
+                  ? null
+                  : NetworkImage(lUser.imagePath as String),
+            ),
+          ),
+        ),
         title: const Text("HI Chat"),
         actions: [
           themeButton(context),
@@ -138,7 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: const Icon(Icons.message_outlined, size: 22),
       ),
-      drawer: hiDrawer(lUser),
     );
   }
 }
