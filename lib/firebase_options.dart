@@ -47,27 +47,27 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAd5W4Vz8bcHfkI80NM7QfjxVwZIn5qSn4',
-    appId: '1:90329613211:web:9f332a98e421e53aef573e',
-    messagingSenderId: '90329613211',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
     projectId: 'chat-app-4c395',
     authDomain: 'chat-app-4c395.firebaseapp.com',
     storageBucket: 'chat-app-4c395.appspot.com',
-    measurementId: 'G-8KVVTM9TQ8',
+    measurementId: '',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBZwXuczJv1zAq5MYvKYNkGkDeWC5b9fXE',
-    appId: '1:90329613211:android:5ca3a6bd77ce4c98ef573e',
-    messagingSenderId: '90329613211',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
     projectId: 'chat-app-4c395',
     storageBucket: 'chat-app-4c395.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAlFRlw_2tcdu9Eq__i0Y6BCjgngO_TLqI',
-    appId: '1:90329613211:ios:0d959de8b0fb8fc8ef573e',
-    messagingSenderId: '90329613211',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
     projectId: 'chat-app-4c395',
     storageBucket: 'chat-app-4c395.appspot.com',
     iosBundleId: 'com.example.chatApp',
